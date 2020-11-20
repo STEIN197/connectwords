@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Connect Words!</title>
+	<style type="text/css">
+		*{
+			font-family: Arial;
+			font-size: 12pt;
+			-webkit-user-select: none;
+		}
+		#mainSide{
+			position: absolute;
+			top: 100px;
+			width: 300px;
+			min-height: 30px;
+			padding: 10px;
+			opacity: 0;
+			border-right: 3px dotted #77f;
+			transition: opacity 2s linear 0s;
+		}
+		#warn{
+			position: absolute;
+			width: 300px;
+			min-height: 30px;
+			border: #f00 solid 2px;
+			border-radius: 15px;
+			background-color: rgba(255, 255, 0, 0.5);
+			text-align: center;
+			color: #f55;
+			padding: 5px;
+			box-sizing: border-box;
+			transform: scale(0.2,0);
+			transition: transform 0.25s linear 0s;
+		}
+		#restTimeBack{
+			position: absolute;
+			left: 800px;
+			top: calc(50% - 250px);
+			width: 75px;
+			height: 500px;
+			border: #000 2px solid;
+			opacity: 0;
+			transition: opacity 2s linear 0s;
+			box-sizing: border-box;
+		}
+		#watch{
+			position: absolute;
+			top: calc(50% - 9px);
+			width: 100%;
+			text-align: center;
+			font-weight: bold;
+		}
+		#restTime{
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			transform-origin: left bottom;
+		}
+		#wordInput{
+			font-size: 16pt;
+			height: 30px;
+			background-color: rgba(255, 255, 255, 0.5);
+			box-sizing: border-box;
+		}
+		.buttons{
+			position: relative;
+			top: -30px;
+			left: 210px;
+			width: 50px;
+			height: 30px;
+			text-align: center;
+			padding: 0px 15px;
+			line-height: 30px;
+			box-sizing: padding-box;
+			cursor: pointer;
+		}
+		#background{
+			position: absolute;
+			top: 0px;
+			width: 100%;
+			height: 100%;
+			z-index: -1;
+			transition: all 2s linear 0s;
+		}
+		#settingsWindow, #settingsWindowBackground{
+			position: absolute;
+			left: calc(50% - 200px);
+			top: 50px;
+			width: 400px;
+			height: 300px;
+			transition: top 2s linear 0s;
+		}
+		#settingsWindowBackground{
+			background-color: #fff;
+			opacity: 0.6;
+			transition: all 1s linear 0s;
+		}
+		#optsTable{
+			position: relative;
+			top: 50px;
+			transition: top 1s linear 0s;
+		}
+		#optsTable tr td{
+			width: 50%;
+			height: 30px;
+		}
+		#optsTable tr td:nth-child(odd){
+			text-align: right;
+			padding-right: 10px;
+		}
+		#optsTable tr td:nth-child(even){
+			padding-left: 10px;
+		}
+		#optsTable tr td>select{
+			width: 120px;
+		}
+		/*Стиль кнопки старта*/
+		#startButton{
+			position: relative;
+			top: 100px;
+			width: 150px;
+			height: 40px;
+			line-height: 40px;
+			font-family: Impact;
+			font-size: 20pt;
+			cursor: pointer;
+		}
+		#startButton:hover, .buttons:hover{
+			transform: scale(1.1, 1.1);
+		}
+		#startButton:active, .buttons:active{
+			transform: scale(0.95, 0.95);
+		}
+		#wordListing{
+			position: relative;
+			left: 400px;
+			top: 20px;
+			width: 270px;
+			cursor: default;
+			opacity: 0;
+			transition: opacity 2s linear 0s;
+		}
+		#wordListing>tbody:first-child, #wordListing>tbody:last-child{
+			background-color: #aaa;
+		}
+		#wordListing>tbody>tr>td{
+			padding: 10px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+		.word_line{
+			min-width: 200px;
+			max-width: 200px;
+			text-align: center;
+			border-right: 4px solid #000;
+			border-radius: 33px 5px;
+		}
+		.time_line{
+			min-width: 70px;
+			max-width: 70px;
+			text-align: center;
+			border-radius: 33px 5px;
+			border-left: 4px solid #ccc;
+		}
+		td[class*="user"]:hover{
+			transform: scale(1.1)
+		}
+		/*Стиль для таймера*/
+		#timer{
+			position: absolute;
+			top: 60px;
+		}
+		.user_0{
+			background-color: #66f;
+			color: #99f;
+		}
+		.user_1{
+			background-color: #f55;
+			color: #f99;
+		}
+		.user_2{
+			background-color: #4b4;
+			color: #9f9;
+		}
+		.user_3{
+			background-color: #aa4;
+			color: #ff9;
+		}
+		.user_4{
+			background-color: #0bb;
+			color: #aff;
+		}
+		.user_5{
+			background-color: #d0d;
+			color: #faf;
+		}
+		.user_6{
+			background-color: #e90;
+			color: #fc5;
+		}
+		.user_7{
+			background-color: #0ff;
+			color: #dff;
+		}
+		#results{
+			position: absolute;
+			left: calc(50% - 540px);
+			width: 1080px;
+			box-sizing: padding-box;
+		}
+		#results>tbody>tr>td{
+			padding: 10px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			min-width: 100px;
+			max-width: 100px;
+			text-align: center;
+			border-right: 4px solid #000;
+			border-radius: 33px 5px;
+			box-sizing: border-box;
+		}
+		#results{
+			opacity: 0;
+			transition: opacity 2s linear 0s;
+		}
+		#results>tbody:first-child{
+			background-color: #fff;
+		}
+	</style>
+</head>
+<body style="margin: 0px; overflow: hidden;">
+	<div id="mainSide">
+		<input type="text" size="12" id="wordInput">
+		<div id="timer">0.000</div>
+		<div id="submitButton" class="buttons user_0">Enter</div><br>
+		<div id="passButton" class="buttons user_0">Pass</div><br>
+		<div id="backButton" class="buttons" style="background-color: #000; color: #fff">Back</div><br>
+		<div id="warn">&#9888 Error</div>
+	</div>
+	<div id="restTimeBack">
+		<div id="restTime"></div>
+		<span id="watch">100%</span>
+	</div>
+	<table id="wordListing" cols="2" cellpadding="0px" cellspacing="5px">
+		<tbody id="words">
+			<tr>
+				<td class="word_line">Words</td>
+				<td class="time_line">Time</td>
+			</tr>
+			<tr id="line0">
+				<td class="word_line">0</td>
+				<td class="time_line">0.000</td>
+			</tr>
+		</tbody>
+	</table>
+	<div id="background"></div>
+	<div id="settingsWindowBackground" align="center"></div>
+	<div id="settingsWindow" align="center">
+		<table cols="2" id="optsTable" cellpadding="0px" cellspacing="0px" width="300px">
+			<tr>
+				<td>Players</td>
+				<td>
+					<select id="playerCountSelect">
+						<option value="1" selected="selected">2 players</option>
+						<option value="2">3 players</option>
+						<option value="3">4 players</option>
+						<option value="4">5 players</option>
+						<option value="5">6 players</option>
+						<option value="6">7 players</option>
+						<option value="7">8 players</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Language</td>
+				<td>
+					<select id="langSelect">
+						<option value="En" selected="selected">English</option>
+						<option value="Ru">Русский</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Time</td>
+				<td>
+					<select id="timeSelect">
+						<option value="120000">2 minutes</option>
+						<option value="300000">5 minutes</option>
+						<option value="600000" selected="selected">10 minutes</option>
+						<option value="900000">15 minutes</option>
+						<option value="1200000">20 minutes</option>
+						<option value="1800000">30 minutes</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>Difficult</td>
+				<td>
+					<select id="letterCountSelect">
+						<option value="1" selected="selected">1 match</option>
+						<option value="2">2 matches</option>
+						<option value="3">3 matches</option>
+					</select>
+				</td>
+			</tr>
+		</table><br>
+		<div id="startButton">Start</div>
+	</div>
+	<script>
+		function randomRange(a, b){
+		    if(!b) return Math.floor(Math.random()*(a + 1));
+		    else return Math.floor(Math.random() * ((b + 1) - a)) + a
+		};
+		Element.prototype.setStyles = function(obj){
+		    for(var prop in obj){
+		        this.style[prop.toString()] = obj[prop.toString()]
+		    }
+		};
+		document.getElementsByAttributes = function(attr, val){
+		    if(typeof attr !== 'string') throw new TypeError('Arguments must be a string');
+		    if(val){
+		        if (typeof val !== 'string') throw new TypeError('Arguments must be a string');
+		    };
+		    var documentTree = document.all,
+		    result = [];
+		    for(var i = 0; i < documentTree.length; i++){
+		        if(!val){
+		            if(documentTree[i].hasAttribute(attr)) result[i] = documentTree[i];
+		            else continue
+		        }
+		        else {
+		            if(documentTree[i].getAttribute(attr) === val) result[i] = documentTree[i];
+		            else continue
+		        }
+		    };
+		    return result = result.filter(function(){return true})
+		};
+		function idToVar(){
+		    var IDarray = document.getElementsByAttributes('id');
+		    for(var i = 0; i < IDarray.length; i++){
+		        window[IDarray[i].getAttribute('id')] = IDarray[i]
+		    };
+		    return document.getElementsByAttributes('id');
+		};
+		idToVar();
+		var randomWords = ['безумие', 'ель', 'лоскут', 'топор', 'рисунок', 'карандаш', 'шелест', 'триумф', 'факт', 'тополь', 'лес', 'стебель', 'локон', 'нос', 'сено', 'окно', 'озеро', 'огонь', 'носок', 'клён', 'необходимость', 'тигр', 'рана', 'арбуз' , 'заяц', 'цапля', 'язык', 'кудесник', 'криптография', 'яблоко', 'око', 'оковы', 'ворот', 'тайвань', 'небо', 'овал', 'любовь', 'вино', 'оккупация', 'ярмарка', 'активист', 'троль', 'лезвие', '', 'environment', 'thickness', 'snake', 'emulation', 'nose', 'exchange', 'evil', 'live', 'existance', 'entry', 'yet', 'taunt', 'throw', 'wire', 'expire', 'emotion', 'nick' ,'kick', 'kill', 'left', 'thing', 'ghost', 'terrorism', 'mount', 'title', 'escalate', 'evaluation', 'nest', 'troll', 'line', 'equation', 'nervous', 'spin', 'nobel', 'lane', 'east', 'town', 'neck', 'kiss', 'south', 'height', 'thought', 'team', 'matter', 'revolution', 'nurse', 'edition'];
+		var colorSchemes = [['#66f', '#99f'], ['#f55', '#f99'], ['#4b4', '#9f9'], ['#aa4', '#ff9'], ['#0bb', '#aff'], ['#d0d', '#faf'], ['#e90', '#fc5'], ['#0ff', '#dff']];
+		var alphabet = {En: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', Ru: 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЭЮЯ'};
+		var currentScheme = colorSchemes[randomRange(colorSchemes.length - 1)];
+		background.style.backgroundColor = currentScheme[0];
+		startButton.setStyles({'background-color': currentScheme[0], color: currentScheme[1]});
+		for(let i = 0; i < randomWords.length*2; i++){
+			let span = document.createElement('span');
+			span.innerText = randomWords[randomRange(randomWords.length - 1)];
+			span.setStyles({
+				position: 'absolute',
+				left: randomRange(window.screen.width) + 'px',
+				top: randomRange(window.screen.height) + 'px',
+				'font-size': randomRange(5, 40) + 'pt',
+				'font-family': 'Impact',
+				color: currentScheme[1],
+				transform: 'rotate(' + randomRange(360) + 'deg)'				
+			});
+			background.appendChild(span)
+		};
+		startButton.addEventListener('click', startGame);
+		var wordList = [];
+		var totalTime = 0;
+		var totalCountOfWords = 0;
+		var shortestWord = 'steingames', longestWord = '', fastestTime = Number.POSITIVE_INFINITY, latestTime = 0;
+		document.addEventListener('wheel', function(e){
+			var currentPosition = getComputedStyle(wordListing).top.slice(0, -2)/1;
+			wordListing.style.top = currentPosition + e.wheelDeltaY/1.5 + 'px'
+		});
+		restTime.style.backgroundColor = currentScheme[0];
+		watch.style.color = currentScheme[1];
+		class Counter{
+		    constructor(limit){
+		        this.limit = limit;
+		        this.pos = 0;
+		        Object.defineProperty(this, 'limit', {
+		            configurable: false,
+		            enumerable: false
+		        });
+		        Object.defineProperty(this, 'pos', {
+		            configurable: false,
+		            enumerable: false
+		        });
+		    }
+		    get increment(){
+		        if(this.pos >= this.limit){
+		            this.pos = 0;
+		            return this.pos
+		        }
+		        else return ++this.pos
+		    }
+		    get decrement(){
+		        if(this.pos === 0){
+		            this.pos = this.limit;
+		            return this.pos
+		        }
+		        else return --this.pos
+		    }
+		};
+		function startGame(e){
+			turn = new Counter(playerCountSelect.selectedOptions[0].value/1);
+			percents = new Counter(100);
+			percents.decrement;
+			playersDictionary = {};
+			for(let i = 0; i <= turn.limit; i++){
+				playersDictionary['Player' + i] = {};
+			};
+			losePoints = {};
+			for(let i = 0; i <= turn.limit; i++){
+				losePoints['Player' + i] = 0;
+			};
+			finalResults = {};
+			for(let i = 0; i <= turn.limit; i++){
+				finalResults['Player' + i] = {};
+				finalResults['Player' + i]['longestWord'] = '';
+				finalResults['Player' + i]['shortestWord'] = '';
+				finalResults['Player' + i]['fastestTime'] = 0;
+				finalResults['Player' + i]['latestTime'] = 0;
+				finalResults['Player' + i]['points'] = 0;
+			};
+			timeOfGame = timeSelect.selectedOptions[0].value/1;
+			selectedLang = langSelect.selectedOptions[0].value;
+			letterCount = letterCountSelect.selectedOptions[0].value;
+			background.style.opacity = 0.2;
+			mainSide.style.opacity = 1;
+			wordListing.style.opacity = restTimeBack.style.opacity = 1;
+			settingsWindow.style.top = -window.screen.height + 'px';
+			settingsWindowBackground.setStyles({
+				width: '300px',
+				opacity: '1',
+				'box-shadow': '0px 0px 30px #555',
+				top: 'calc(50% - 150px)',
+				left: 'calc(50% - 150px)',
+				'font-size': '90pt',
+				'line-height': '300px',
+				border: '5px solid #000',
+				'border-radius': '50px'
+			});
+			var intID = setInterval(function(){
+				settingsWindowBackground.innerText = alphabet[selectedLang][randomRange(alphabet[selectedLang].length - 1)]
+			}, 50);
+			var timeID = setTimeout(function(){
+				clearInterval(intID);
+				clearTimeout(timeID);
+				wordList.push(settingsWindowBackground.innerText.toLowerCase());
+				timeID = setTimeout(function(){
+					clearTimeout(timeID);
+					settingsWindowBackground.setStyles({
+						width: '30px',
+						height: '30px',
+						'box-shadow': 'none',
+						top: '110px',
+						left: '4px',
+						'font-size': '16pt',
+						'line-height': '30px',
+						background: 'none',
+						border: 'none',
+						'border-radius': '0px'
+					});
+					wordListing.style.transition = 'top 0.1s linear 0s';
+					timeID = setTimeout(function(){
+						clearTimeout(timeID);
+						wordInput.value = settingsWindowBackground.innerText;
+						settingsWindowBackground.hidden = true;
+						submitButton.addEventListener('click', connectWords);
+						wordInput.addEventListener('keypress', function(e){
+							if(e.keyIdentifier === 'Enter') connectWords();
+							else return
+						});
+						passButton.addEventListener('click', function(e){
+							losePoints['Player' + turn.pos] += 5;
+							turn.increment;
+							submitButton.className = 'buttons user_' + turn.pos;
+							passButton.className = 'buttons user_' + turn.pos;
+							startTime = new Date();
+						});
+						backButton.addEventListener('click', function(e){
+							wordListing.style.top = '20px'
+						});
+						startTime = new Date();
+						currentTimeINT = setInterval(currentTime, 10)
+						gameEndID = setTimeout(gameEnd, timeOfGame);
+						watchINT = setInterval(function(){
+							percents.decrement;
+							watch.innerText = percents.pos + '%';
+							restTime.style.transform = 'scaleY(' + (percents.pos/100) + ')';
+						}, timeOfGame/100);
+					}, 1000)
+				}, 1000);
+			}, 5000);
+		};
+
+		function connectWords(){
+			var word = wordInput.value.toLowerCase();
+			if(selectedLang === 'En') var wordReg = /^[a-z]+$/;
+			else var wordReg = /^[а-яё]+$/;
+			if(wordReg.test(word)){
+				var lastWord = wordList[wordList.length - 1];
+				if(/[ъыь]/.test(lastWord.substr(-1))) lastWord = lastWord.slice(0, -1);
+				if(word.startsWith(lastWord.substr(-letterCount))){
+					if (wordList.find(function(v, i, a){
+						if(word === v) return true;
+						else return false
+					})){
+						warning(`\u26a0 Слово ${word} уже существует`);
+						console.warn(`Слово ${word} уже существует`);
+						wordInput.value = '';
+						}
+					else{
+						var newLine = document.createElement('tr');	
+						newLine.setAttribute('id', 'line' + wordList.length);
+						var td1 = document.createElement('td');
+						td1.className = 'word_line user_' + turn.pos;
+						var td2 = document.createElement('td');
+						td2.className = 'time_line user_' + turn.pos;
+						td1.innerText = word;
+						td1.setAttribute('title', word);
+						td2.innerText = timer.innerText;
+						td2.setAttribute('title', timer.innerText);
+						newLine.appendChild(td1);
+						newLine.appendChild(td2);
+						words.insertBefore(newLine, document.getElementById('line' + (wordList.length - 1)));
+						totalTime += (td2.innerText/1);
+						totalCountOfWords++;
+						line0.children[1].innerText = totalTime.toFixed(3);
+						line0.children[0].innerText = totalCountOfWords;
+						wordList.push(word);
+						playersDictionary['Player' + turn.pos][word] = timer.innerText/1;
+						if(timer.innerText/1 > latestTime) latestTime = timer.innerText/1;
+						if(timer.innerText/1 < fastestTime) fastestTime = timer.innerText/1;
+						turn.increment;
+						wordInput.value = '';
+						submitButton.className = 'buttons user_' + turn.pos;
+						passButton.className = 'buttons user_' + turn.pos;
+						if(word.length > longestWord.length) longestWord = word;
+						if(word.length < shortestWord.length) shortestWord = word;
+						startTime = new Date();
+					}
+				}
+				else {
+					warning(`\u26a0 Введенное слово должно начинаться с ${lastWord.substr(-letterCount)}-`)
+					console.warn(`Введенное слово должно начинаться с ${lastWord.substr(-letterCount)}-`);
+					wordInput.value = '';
+				}
+			}
+			else {
+				warning(`\u26a0 Слово ${word} содержит недопустимые символы`);
+				console.warn(`Слово ${word} содержит недопустимые символы`);
+				wordInput.value = '';
+			}
+		};
+		function warning(msg){
+			warn.innerText = msg;
+			warn.style.transform = 'scaleY(1)';
+			warnStyleID = setTimeout(function(){
+				warn.style.transform = 'scaleX(1)';
+				clearTimeout(warnStyleID);
+			}, 250);
+			warnStyleDisappearID = setTimeout(function(){
+				warn.style.transform = 'scale(0.2, 0)';
+				clearTimeout(warnStyleDisappearID);
+			}, 2250);
+		};
+		function currentTime(){
+			 ms = new Date();
+			 var time = (ms - startTime).toString();
+			 timer.innerText = time.slice(0, -3) + '.' + time.slice(-3)
+		};
+		function gameEnd(){
+			clearInterval(currentTimeINT);
+			clearTimeout(gameEndID);
+			clearInterval(watchINT);
+			timer.innerText = '0.000';
+			background.style.opacity = 1;
+			wordListing.style.transition = 'opacity 2s linear 0s';
+			mainSide.style.opacity = wordListing.style.opacity = restTimeBack.style.opacity = 0;
+			for(var plr in playersDictionary){
+				var maxT = Number.NEGATIVE_INFINITY;
+				var minT = Number.POSITIVE_INFINITY;
+				var maxW = '';
+				var minW = 'steingames';
+				var points = playerWords = 0;
+				for(var word in playersDictionary[plr]){
+					if(playersDictionary[plr][word] > maxT) maxT = playersDictionary[plr][word];
+					if(playersDictionary[plr][word] < minT) minT = playersDictionary[plr][word];
+					if(word.length > maxW.length) maxW = word;
+					if(word.length < minW.length) minW = word;
+					playerWords++;
+					points += playersDictionary[plr][word]
+				};
+				finalResults[plr]['fastestTime'] = minT;
+				finalResults[plr]['latestTime'] = maxT;
+				finalResults[plr]['longestWord'] = maxW;
+				finalResults[plr]['shortestWord'] = minW;
+				finalResults[plr]['points'] = Math.round((points/playerWords)*10 + losePoints[plr]);
+			};
+			var table = document.createElement('table');
+			var tbody = document.createElement('tbody');
+			var tr = document.createElement('tr');
+			tr.innerHTML = '<td>Player</td><td>Shortest word</td><td>Longest word</td><td>Fastest time</td><td>Latest time</td><td>Lose points</td><td>Number of words</td><td>Total time</td><td>Total score</td>';
+			tbody.appendChild(tr);
+			for(let player in playersDictionary){
+				var numberOfWords = 0;
+				var totalTimeForPlayer = 0;
+				var tr = document.createElement('tr');
+				for(let col in playersDictionary[player]){
+					++numberOfWords;
+					totalTimeForPlayer += playersDictionary[player][col];
+				};
+				tr.innerHTML = '<td>' + player + '</td><td>' + finalResults[player]['shortestWord'] + '</td><td>' + finalResults[player]['longestWord'] + '</td><td>' + finalResults[player]['fastestTime'] + '</td><td>' + finalResults[player]['latestTime'] + '</td><td>' + losePoints[player] + '</td><td>' + numberOfWords + '</td><td>' + totalTimeForPlayer + '</td><td>' + finalResults[player]['points'] + '</td>';
+				tr.className = 'user_' + player.slice(-1);
+				tbody.appendChild(tr);
+			};
+			table.appendChild(tbody);
+			table.setAttribute('id', 'results');
+			table.setAttribute('cellspacing', '5px');
+			table.setAttribute('cellpadding', '0px');
+			console.info('The game has been finished');
+			document.body.insertBefore(table, document.scripts[0]);
+			results.style.top = 'calc(50% - ' + getComputedStyle(results).height.slice(0, -2)/2 + 'px)';
+			results.style.opacity = 1;
+			return table
+		};
+	</script>
+</body>
+</html>
